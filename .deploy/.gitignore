@@ -1,0 +1,5 @@
+# local environment variable
+.env
+
+# dev data
+/data
