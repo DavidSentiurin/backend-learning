@@ -1,14 +1,23 @@
-import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { LanguagesEnum, RolesEnum } from '../../common/enums';
-
 import { IsUniqUserEmail } from '../../common/validators';
+import { urlRegex } from '../../common/constants';
 
 export class UpdateUserDto {
   @ApiProperty()
   @IsOptional()
-  @IsString()
+  @Matches(urlRegex, {
+    message: 'Url format is invalid',
+  })
   avatar?: string;
 
   @ApiProperty()
@@ -32,10 +41,10 @@ export class UpdateUserDto {
   @ApiProperty({ enum: LanguagesEnum })
   @IsOptional()
   @IsEnum(LanguagesEnum)
-  language: string;
+  language: LanguagesEnum;
 
   @ApiProperty({ enum: RolesEnum })
   @IsOptional()
   @IsEnum(RolesEnum)
-  userType: RolesEnum;
+  role: RolesEnum;
 }

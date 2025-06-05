@@ -27,7 +27,7 @@ export class UserRo {
 
   @ApiHideProperty()
   @Exclude()
-  passwordHash: string;
+  password: string;
 
   @ApiProperty({ enum: LanguagesEnum, required: false })
   @Expose()

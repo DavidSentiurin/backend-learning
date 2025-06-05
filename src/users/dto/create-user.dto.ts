@@ -14,11 +14,14 @@ import { RolesEnum } from '../../common/enums';
 import { Match, IsUniqUserEmail } from '../../common/validators';
 
 import { passwordRegExp } from '../constants';
+import { urlRegex } from '../../common/constants';
 
 export class CreateUserDto {
   @ApiProperty()
   @IsOptional()
-  @IsString()
+  @Matches(urlRegex, {
+    message: 'Url format is invalid',
+  })
   avatar?: string;
 
   @ApiProperty()
@@ -37,7 +40,10 @@ export class CreateUserDto {
   lastName: string;
 
   @ApiProperty()
-  @Matches(passwordRegExp)
+  @Matches(passwordRegExp, {
+    message:
+      'Password must be at least 8 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character',
+  })
   password: string;
 
   @ApiProperty()

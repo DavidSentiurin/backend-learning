@@ -5,7 +5,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 
-
 const API_VERSION = '1';
 
 async function bootstrap() {
@@ -19,7 +18,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-    })
+    }),
   );
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -36,7 +35,7 @@ async function bootstrap() {
   await app.listen(port);
 
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
   );
 }
 

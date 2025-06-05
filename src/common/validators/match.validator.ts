@@ -19,7 +19,9 @@ export function Match(property: string, validationOptions?: ValidationOptions) {
           const [relatedPropertyKey] = validationArguments?.constraints || [];
           const relatedPropertyValue =
             validationArguments && typeof relatedPropertyKey === 'string'
-              ? (validationArguments.object as Record<string, unknown>)[relatedPropertyKey]
+              ? (validationArguments.object as Record<string, unknown>)[
+                  relatedPropertyKey
+                ]
               : undefined;
 
           return relatedPropertyValue === value;

@@ -5,18 +5,24 @@ import { intersection } from 'lodash';
 import { RolesEnum } from '../../common/enums';
 import { Roles } from '../../common/decorators';
 
-
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles: RolesEnum[] = this.reflector.get(Roles, context.getHandler());
+    const requiredRoles: RolesEnum[] = this.reflector.get(
+      Roles,
+      context.getHandler(),
+    );
 
     if (!requiredRoles || Object.keys(requiredRoles).length === 0) return true;
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+
+    if (user.roles && user.roles.includes(RolesEnum.SUPER_ADMIN)) {
+      return true;
+    }
 
     if (!user || !user.roles) return false;
 

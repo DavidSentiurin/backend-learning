@@ -7,13 +7,12 @@ import { UsersService } from '../users/users.service';
 
 import { LoginDto, RegisterDto } from './dto';
 
-
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   private async validateUser(email: string, password: string) {
@@ -21,13 +20,13 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException(
-        'The email or password you entered is incorrect'
+        'The email or password you entered is incorrect',
       );
     }
 
     const isPasswordValid = await this.hashService.verify(
       password,
-      user.passwordHash
+      user.password,
     );
 
     if (isPasswordValid) {
@@ -46,7 +45,7 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException(
-        'The email or password you entered is incorrect'
+        'The email or password you entered is incorrect',
       );
     }
 

@@ -7,6 +7,8 @@ import {
   Param,
   Patch,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 

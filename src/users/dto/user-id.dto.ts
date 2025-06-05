@@ -1,11 +1,11 @@
-// import { IsUUID } from 'class-validator';
+import { IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { IsUserId } from '../../common/validators';
 
 export class UserIdDto {
-  // @IsUUID()
   @ApiProperty()
-  @IsUserId()
+  @IsUserId(false)
+  @IsUUID()
   id: string;
 }

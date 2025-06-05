@@ -1,5 +1,7 @@
 import {
+  isUUID,
   registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -13,22 +15,34 @@ import { UsersService } from '../../users/users.service';
 export class IsUserIdConstraint implements ValidatorConstraintInterface {
   constructor(private readonly usersService: UsersService) {}
 
-  async validate(userId: string): Promise<boolean> {
+  async validate(userId: string, args: ValidationArguments): Promise<boolean> {
+    if (!isUUID(userId)) return false;
+
     const user = await this.usersService.findById(userId);
 
-    if (!user) throw new NotFoundException('The user is not found.');
+    const throwErrorIfNotFound = args.constraints[0];
 
-    return true;
+    if (throwErrorIfNotFound && !user)
+      throw new NotFoundException('The user is not found.');
+
+    return !!user;
+  }
+
+  defaultMessage(): string {
+    return 'The user is not found.';
   }
 }
 
-export function IsUserId(validationOptions?: ValidationOptions) {
+export function IsUserId(
+  throwErrorIfNotFound: boolean = false,
+  validationOptions?: ValidationOptions,
+) {
   return function (object: Record<string, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      constraints: [],
+      constraints: [throwErrorIfNotFound],
       validator: IsUserIdConstraint,
     });
   };

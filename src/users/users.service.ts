@@ -1,108 +1,63 @@
 import { Injectable } from '@nestjs/common';
 
-import { LanguagesEnum, RolesEnum } from '../common/enums';
+import { RolesEnum } from '../common/enums';
+import { HashService } from '../common/services';
 
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserEntity } from './entities';
-import { HashService } from '../common/services';
+import { UsersRepository } from './repositories';
+import { SuccessRo } from '../common/ro';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly hashService: HashService) {}
-
-  private readonly users: UserEntity[] = [
-    {
-      id: 'u1a9b2c3',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      email: 'emma.williams@example.com',
-      firstName: 'Emma',
-      lastName: 'Williams',
-      passwordHash: '$2b$10$abc123hashedexamplepassword1',
-      language: LanguagesEnum.English,
-      isTermsConfirmed: true,
-      roles: [RolesEnum.ADMIN],
-    },
-    {
-      id: 'u4d5e6f7g',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      email: 'dmytro.kovalenko@example.com',
-      firstName: 'Dmytro',
-      lastName: 'Kovalenko',
-      passwordHash: '$2b$10$abc123hashedexamplepassword2',
-      language: LanguagesEnum.Ukrainian,
-      isTermsConfirmed: true,
-      roles: [RolesEnum.USER],
-    },
-    {
-      id: 'u8h9i0j1k',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      email: 'lucas.johnson@example.com',
-      firstName: 'Lucas',
-      lastName: 'Johnson',
-      passwordHash: '$2b$10$abc123hashedexamplepassword3',
-      language: LanguagesEnum.English,
-      isTermsConfirmed: true,
-      roles: [RolesEnum.USER],
-    },
-  ];
+  constructor(
+    private readonly hashService: HashService,
+    private readonly usersRepository: UsersRepository,
+  ) {}
 
   async getAll(): Promise<UserEntity[]> {
-    return this.users;
+    return this.usersRepository.findAll();
   }
 
   async findByEmail(
     userEmail: UserEntity['email'],
-  ): Promise<UserEntity | undefined> {
-    return this.users.find((user) => user.email === userEmail);
+  ): Promise<UserEntity | null> {
+    return this.usersRepository.findByEmail(userEmail);
   }
 
-  async findById(id: UserEntity['id']): Promise<UserEntity | undefined> {
-    return this.users.find((user) => user.id === id);
+  async findById(id: UserEntity['id']): Promise<UserEntity | null> {
+    return this.usersRepository.findById(id);
   }
 
   async create(user: CreateUserDto): Promise<UserEntity> {
-    const passwordHash = await this.hashService.hash(user.password);
+    const password = await this.hashService.hash(user.password);
 
-    const createdUser: UserEntity = {
+    return this.usersRepository.createOne({
       ...user,
-      id: Math.random().toString().slice(2, 11),
-      passwordHash,
-      roles: user.roles || [RolesEnum.USER],
-    };
-
-    this.users.push(createdUser);
-
-    return createdUser;
+      password,
+      roles: [RolesEnum.USER],
+    });
   }
 
   async update(
     userId: UserEntity['id'],
     updateData: UpdateUserDto,
-  ): Promise<UserEntity | undefined> {
-    const userIndex = this.users.findIndex((u) => u.id === userId);
+  ): Promise<UserEntity | null> {
+    const result = await this.usersRepository.updateOne(userId, updateData);
 
-    if (userIndex === -1) return;
+    if (result.affected === 0) return null;
 
-    const providedFields = Object.fromEntries(
-      Object.entries(updateData).filter(([_, value]) => value !== undefined),
-    );
-
-    this.users[userIndex] = {
-      ...this.users[userIndex],
-      ...providedFields,
-    };
-
-    return this.users[userIndex];
+    return this.usersRepository.findById(userId);
   }
 
-  async delete(userId: UserEntity['id']): Promise<{ success: boolean }> {
-    const userIndex = this.users.findIndex((u) => u.id === userId);
+  async delete(userId: UserEntity['id']): Promise<SuccessRo> {
+    const user = await this.usersRepository.findById(userId);
 
-    if (userIndex === -1) {
-      return { success: false };
-    }
+    if (!user) throw { success: false };
 
-    this.users.splice(userIndex, 1);
+    const removedUser = await this.usersRepository.removeOne(user);
+
+    if (!removedUser) return { success: false };
 
     return { success: true };
   }

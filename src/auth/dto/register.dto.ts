@@ -1,10 +1,16 @@
-import { IsBoolean, IsEmail, IsEnum, IsString, Length, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { IsUniqUserEmail, Match } from '../../common/validators';
 
 import { passwordRegExp } from '../../users/constants';
-
 
 export class RegisterDto {
   @ApiProperty()

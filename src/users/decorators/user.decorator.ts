@@ -8,5 +8,5 @@ export const GetUser = createParamDecorator(
     const user: UserEntity = request.user;
 
     return field ? user[field] : user;
-  }
+  },
 );

@@ -1,39 +1,39 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 import { LanguagesEnum, RolesEnum } from '../../common/enums';
+import { MyBaseEntity } from '../../common/entities';
 
-export class UserEntity {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
-  @Column({ nullable: true, length: 2000 })
+@Entity('users')
+export class UserEntity extends MyBaseEntity {
+  @Column({ nullable: true, length: 2083 })
   avatar?: string;
 
   @Column({ unique: true, length: 200 })
   email: string;
 
-  @Column({ length: 50 })
+  @Column({ name: 'first_name', length: 50 })
   firstName: string;
 
-  @Column({ length: 50 })
+  @Column({ name: 'last_name', length: 50 })
   lastName: string;
 
-  @Column({ length: 200 })
-  passwordHash: string;
+  @Column()
+  password: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: LanguagesEnum,
-    default: LanguagesEnum.English
+    default: LanguagesEnum.English,
   })
   language?: LanguagesEnum;
 
-  @Column({ type: 'boolean', length: 1000 })
+  @Column({ name: 'is_terms_confirmed', type: 'boolean' })
   isTermsConfirmed: boolean;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: RolesEnum,
+    array: true,
   })
   roles: RolesEnum[];
 }
