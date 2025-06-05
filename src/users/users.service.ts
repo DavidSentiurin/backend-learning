@@ -1,4 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import {
+  Pagination,
+  IPaginationOptions,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 
 import { RolesEnum } from '../common/enums';
 import { HashService } from '../common/services';
@@ -17,6 +22,12 @@ export class UsersService {
 
   async getAll(): Promise<UserEntity[]> {
     return this.usersRepository.findAll();
+  }
+
+  async getPaginatedAll(
+    options: IPaginationOptions,
+  ): Promise<Pagination<UserEntity>> {
+    return paginate<UserEntity>(this.usersRepository, options);
   }
 
   async findByEmail(

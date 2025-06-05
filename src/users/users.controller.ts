@@ -7,6 +7,9 @@ import {
   Param,
   Patch,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
@@ -30,10 +33,19 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles([RolesEnum.ADMIN])
   @Get()
-  async findAllUsers() {
-    const users = await this.usersService.getAll();
+  async findAllUsers(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ) {
+    const paginatedUsers = await this.usersService.getPaginatedAll({
+      page,
+      limit,
+    });
 
-    return users.map((user) => UserRo.fromEntity(user));
+    return {
+      ...paginatedUsers,
+      items: paginatedUsers.items.map((user) => UserRo.fromEntity(user)),
+    };
   }
 
   @ApiResponse({ type: UserRo })
