@@ -7,6 +7,10 @@ import { AppModule } from './../src/app.module';
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -16,10 +20,10 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/users/me', () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .get('/users/me')
+      .expect(401)
+      .expect({ message: 'Unauthorized', statusCode: 401 });
   });
 });
