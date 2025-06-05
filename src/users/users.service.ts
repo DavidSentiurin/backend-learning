@@ -53,7 +53,7 @@ export class UsersService {
   async delete(userId: UserEntity['id']): Promise<SuccessRo> {
     const user = await this.usersRepository.findById(userId);
 
-    if (!user) throw { success: false };
+    if (!user) return { success: false };
 
     const removedUser = await this.usersRepository.removeOne(user);
 

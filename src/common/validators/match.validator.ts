@@ -16,7 +16,9 @@ export function Match(property: string, validationOptions?: ValidationOptions) {
           value: unknown,
           validationArguments?: ValidationArguments,
         ): Promise<boolean> | boolean {
-          const [relatedPropertyKey] = validationArguments?.constraints || [];
+          const relatedPropertyKey: unknown =
+            validationArguments?.constraints?.[0];
+
           const relatedPropertyValue =
             validationArguments && typeof relatedPropertyKey === 'string'
               ? (validationArguments.object as Record<string, unknown>)[

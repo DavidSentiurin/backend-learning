@@ -2,13 +2,10 @@ import { LanguagesEnum, RolesEnum } from 'src/common/enums';
 import { HashService } from 'src/common/services';
 import { UserEntity } from 'src/users/entities';
 import { DataSource } from 'typeorm';
-import { Seeder, SeederFactoryManager } from 'typeorm-extension';
+import { Seeder } from 'typeorm-extension';
 
 export default class CreateSuperAdmin1749124203010 implements Seeder {
-  public async run(
-    dataSource: DataSource,
-    factoryManager: SeederFactoryManager,
-  ): Promise<any> {
+  public async run(dataSource: DataSource): Promise<any> {
     const initialEmail = 'admin@superadmin.com';
 
     const userRepository = dataSource.getRepository(UserEntity);

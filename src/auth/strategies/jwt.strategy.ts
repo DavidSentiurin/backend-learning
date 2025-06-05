@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { UsersService } from '../../users/users.service';
 
+import { JwtPayload } from '../interfaces';
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -18,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: JwtPayload) {
     const userId = payload.sub;
 
     return this.usersService.findById(userId);

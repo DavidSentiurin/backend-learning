@@ -39,4 +39,5 @@ async function bootstrap() {
   );
 }
 
+// eslint-disable-next-line
 bootstrap();

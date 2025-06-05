@@ -7,8 +7,6 @@ import {
   Param,
   Patch,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
@@ -35,14 +33,14 @@ export class UsersController {
   async findAllUsers() {
     const users = await this.usersService.getAll();
 
-    return users.map(UserRo.fromEntity);
+    return users.map((user) => UserRo.fromEntity(user));
   }
 
   @ApiResponse({ type: UserRo })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles()
   @Get('me')
-  async ownProfile(@GetUser() user: UserEntity) {
+  ownProfile(@GetUser() user: UserEntity) {
     return UserRo.fromEntity(user);
   }
 

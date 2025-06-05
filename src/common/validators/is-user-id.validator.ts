@@ -20,7 +20,7 @@ export class IsUserIdConstraint implements ValidatorConstraintInterface {
 
     const user = await this.usersService.findById(userId);
 
-    const throwErrorIfNotFound = args.constraints[0];
+    const throwErrorIfNotFound = Boolean(args.constraints[0]);
 
     if (throwErrorIfNotFound && !user)
       throw new NotFoundException('The user is not found.');

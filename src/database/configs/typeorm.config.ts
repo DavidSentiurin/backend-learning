@@ -2,7 +2,6 @@ import { config as dotenvConfig } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
 import { join } from 'path';
-import fs from 'fs';
 
 dotenvConfig({ path: '.env' });
 

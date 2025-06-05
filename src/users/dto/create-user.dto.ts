@@ -8,7 +8,6 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { omit } from 'lodash';
 
 import { RolesEnum } from '../../common/enums';
 import { Match, IsUniqUserEmail } from '../../common/validators';
