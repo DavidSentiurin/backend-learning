@@ -1,22 +1,23 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { HashService } from './common/services';
+import { HashUtil } from '@project-utils/hash';
 
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { DatabaseModule } from './database/database.module';
+// Modules
+import { AuthModule } from '@project-modules/auth';
+import { UserModule } from '@project-modules/user';
+import { PostgresModule } from '@project-infrastructure/databases';
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    DatabaseModule,
+    PostgresModule,
   ],
   controllers: [],
-  providers: [HashService],
+  providers: [HashUtil],
 })
 export class AppModule {}
