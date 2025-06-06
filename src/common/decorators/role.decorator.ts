@@ -1,5 +1,5 @@
 import { Reflector } from '@nestjs/core';
 
-import { RolesEnum } from '../../common/enums';
+import { RolesEnum } from '../enums';
 
 export const Roles = Reflector.createDecorator<RolesEnum[]>();
