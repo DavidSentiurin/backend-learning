@@ -16,6 +16,12 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@project-common/*": ["src/common/*"],
+      "@project-modules/*": ["src/modules/*"],
+      "@project-infrastructure/*": ["src/infrastructure/*"],
+      "@project-utils/*": ["src/utils/*"]
+    }
   }
 }
