@@ -9,3 +9,4 @@ export {
   IsUserId,
 } from './validators';
 export { passwordRegExp } from './constants';
+export { IUserService } from './interfaces';
