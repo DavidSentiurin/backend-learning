@@ -31,6 +31,10 @@
 $ npm install
 ```
 
+## Redis source
+
+https://nikooiko.medium.com/nestjs-redis-383edea08f0b
+
 ## Compile and run the project
 
 ```bash

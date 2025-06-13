@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   Pagination,
   IPaginationOptions,
@@ -11,12 +11,16 @@ import { UserRepository } from './repositories';
 import { HashUtil } from '../../utils/hash';
 import { RolesEnum } from '../../common/enums';
 import { SuccessRo } from '../../common/ro';
+import { QueryRunnerFactory } from '../../infrastructure/databases';
+import { AuthSessionService } from '../auth/services';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly hashService: HashUtil,
     private readonly usersRepository: UserRepository,
+    private readonly queryRunnerFactory: QueryRunnerFactory,
+    @Inject(forwardRef(() => AuthSessionService)) private readonly authSessionService: AuthSessionService,
   ) {}
 
   async getAll(): Promise<UserEntity[]> {
@@ -58,15 +62,35 @@ export class UserService {
     return this.usersRepository.findOneBy({ id });
   }
 
-  async delete(id: UserEntity['id']): Promise<SuccessRo> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async delete(userId: UserEntity['id']): Promise<SuccessRo> {
+    const queryRunner = this.queryRunnerFactory.create();
 
-    if (!user) return { success: false };
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    const removedUser = await this.usersRepository.remove(user);
+      // Delete the user
+      const deletedUser = await queryRunner.manager.delete(UserEntity, { id: userId });
 
-    if (!removedUser) return { success: false };
+      if (!deletedUser.affected || deletedUser.affected === 0) {
+        await queryRunner.rollbackTransaction();
+        return { success: false };
+      }
 
-    return { success: true };
+      const { success } = await this.authSessionService.delete(userId);
+
+      if (!success) {
+        await queryRunner.rollbackTransaction();
+        return { success: false };
+      }
+
+      await queryRunner.commitTransaction();
+      return { success: true };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { LanguagesEnum, RolesEnum } from '../../../common/enums';
 
 export interface IUser {
+  id: string;
   avatar?: string;
   email: string;
   firstName: string;
