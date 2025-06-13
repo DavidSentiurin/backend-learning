@@ -1,7 +1,9 @@
-import { Column, Entity } from 'typeorm';
+import { AfterRemove, Column, Entity } from 'typeorm';
 
 import { LanguagesEnum, RolesEnum } from '../../../common/enums';
 import { MyBaseEntity } from '../../../common/entities';
+import { Inject } from '@nestjs/common';
+import { SessionService } from '../../session/session.service';
 
 @Entity('users')
 export class UserEntity extends MyBaseEntity {

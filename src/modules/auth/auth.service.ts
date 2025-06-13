@@ -1,9 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserService } from '../user/user.service';
 import { LoginDto, RegisterDto } from './dto';
 import { HashUtil } from '../../utils/hash';
+import { AuthUtil } from './utils';
+import { UserEntity } from '../user/entities';
+import { SessionService } from '../session/session.service';
+import { AUTH_SESSION_PREFIX } from './constants';
+import { SuccessRo } from '../../common/ro';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +16,8 @@ export class AuthService {
     private readonly usersService: UserService,
     private readonly hashService: HashUtil,
     private readonly jwtService: JwtService,
+    private readonly authUtil: AuthUtil,
+    private readonly sessionService: SessionService,
   ) {}
 
   private async validateUser(email: string, password: string) {
@@ -51,8 +58,21 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload);
 
+    const expiration = this.authUtil.getAccessTokenExpiration();
+
+    const authSessionKey = this.authUtil.getAuthSessionKey(user.id);
+    await this.sessionService.set(authSessionKey, accessToken, expiration);
+
     return { accessToken };
   }
 
-  // async logout() {}
+  async logout(userId: UserEntity['id']):Promise<SuccessRo> {
+    const authSessionKey = this.authUtil.getAuthSessionKey(userId);
+
+    const result = await this.sessionService.delete(authSessionKey);
+
+    if (!result) return { success: false };
+
+    return { success: true };
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { LoginRo } from './ro';
@@ -6,6 +6,8 @@ import { LoginDto, RegisterDto } from './dto';
 
 import { AuthService } from './auth.service';
 import { UserRo } from '../user/ro';
+import { GetUser } from '../user/decorators';
+import { AuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {
@@ -25,8 +27,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  // @Post('logout')
-  // async logout() {
-  //   return this.authService.logout();
-  // }
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  async logout(@GetUser('id') userId: UserRo['id']) {
+    return this.authService.logout(userId);
+  }
 }

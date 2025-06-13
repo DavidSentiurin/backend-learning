@@ -1,0 +1,1 @@
+export { InjectRedisService } from './inject-redis.decorator';

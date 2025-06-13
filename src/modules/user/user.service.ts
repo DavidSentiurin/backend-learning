@@ -11,12 +11,14 @@ import { UserRepository } from './repositories';
 import { HashUtil } from '../../utils/hash';
 import { RolesEnum } from '../../common/enums';
 import { SuccessRo } from '../../common/ro';
+import { SessionService } from '../session/session.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly hashService: HashUtil,
     private readonly usersRepository: UserRepository,
+    private readonly sessionService: SessionService,
   ) {}
 
   async getAll(): Promise<UserEntity[]> {
@@ -58,14 +60,19 @@ export class UserService {
     return this.usersRepository.findOneBy({ id });
   }
 
-  async delete(id: UserEntity['id']): Promise<SuccessRo> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async delete(userId: UserEntity['id']): Promise<SuccessRo> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
 
     if (!user) return { success: false };
 
-    const removedUser = await this.usersRepository.remove(user);
+    const removedUser = await this.usersRepository.remove(user
+      // TODO:
+      // , { data }
+    );
 
     if (!removedUser) return { success: false };
+
+    await this.sessionService.delete(userId);
 
     return { success: true };
   }
