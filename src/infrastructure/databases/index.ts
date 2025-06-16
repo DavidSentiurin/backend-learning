@@ -1,1 +1,2 @@
-export { PostgresModule } from './postgres/postgres.module';
+export { PostgresModule, QueryRunnerFactory } from './postgres';
+export { RedisModule, RedisService } from './redis';

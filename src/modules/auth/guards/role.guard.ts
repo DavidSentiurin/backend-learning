@@ -4,7 +4,7 @@ import { intersection } from 'lodash';
 
 import { RolesEnum } from '../../../common/enums';
 import { Roles } from '../../../common/decorators';
-import { IUser } from '../../user/interfaces';
+import { UserEntity } from '../../user/entities';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,7 +18,7 @@ export class RolesGuard implements CanActivate {
 
     if (!requiredRoles || Object.keys(requiredRoles).length === 0) return true;
 
-    const request = context.switchToHttp().getRequest<{ user: IUser }>();
+    const request = context.switchToHttp().getRequest<{ user: UserEntity }>();
     const user = request.user;
 
     if (user.roles && user.roles.includes(RolesEnum.SUPER_ADMIN)) {

@@ -1,20 +1,30 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { UserService } from '../user/user.service';
-import { LoginDto, RegisterDto } from './dto';
-import { HashUtil } from '../../utils/hash';
+import { UserService } from '../../user/user.service';
+import { LoginDto, RegisterDto } from '../dto';
+import { HashUtil } from '../../../utils/hash';
+import { UserEntity } from '../../user/entities';
+import { SuccessRo } from '../../../common/ro';
+import { AuthSessionService } from './auth-session.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UserService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
     private readonly hashService: HashUtil,
     private readonly jwtService: JwtService,
+    private readonly authSessionService: AuthSessionService,
   ) {}
 
   private async validateUser(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.userService.findByEmail(email);
 
     if (!user) {
       throw new UnauthorizedException(
@@ -35,7 +45,7 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    return this.usersService.create(registerDto);
+    return this.userService.create(registerDto);
   }
 
   async login(loginDto: LoginDto) {
@@ -51,8 +61,12 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload);
 
+    await this.authSessionService.set(user.id, accessToken);
+
     return { accessToken };
   }
 
-  // async logout() {}
+  async logout(userId: UserEntity['id']): Promise<SuccessRo> {
+    return this.authSessionService.delete(userId);
+  }
 }

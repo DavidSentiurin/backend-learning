@@ -22,14 +22,14 @@ import { UserEntity } from './entities';
 import { RolesEnum } from '../../common/enums';
 import { Roles } from '../../common/decorators';
 import { SuccessRo } from '../../common/ro';
-import { JwtAuthGuard, RolesGuard } from '../auth/guards';
+import { AuthGuard, RolesGuard } from '../auth/guards';
 
 @Controller('users')
 export class UserController {
   constructor(private usersService: UserService) {}
 
   @ApiResponse({ type: [UserRo] })
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles([RolesEnum.ADMIN])
   @Get()
   async findAllUsers(
@@ -48,7 +48,7 @@ export class UserController {
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles()
   @Get('me')
   ownProfile(@GetUser() user: UserEntity) {
@@ -56,7 +56,7 @@ export class UserController {
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles()
   @Get(':id')
   async findUserById(@Param() params: UserIdDto) {
@@ -68,7 +68,7 @@ export class UserController {
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles()
   @Patch(':id')
   async update(@Param() params: UserIdDto, @Body() user: UpdateUserDto) {
@@ -80,8 +80,8 @@ export class UserController {
   }
 
   @ApiResponse({ type: SuccessRo })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles([RolesEnum.ADMIN])
+  @UseGuards(AuthGuard, RolesGuard)
+  // @Roles([RolesEnum.ADMIN])
   @Delete(':id')
   async delete(@Param() params: UserIdDto): Promise<SuccessRo> {
     const { success } = await this.usersService.delete(params.id);

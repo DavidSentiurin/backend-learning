@@ -11,12 +11,15 @@ import { UserRepository } from './repositories';
 import { HashUtil } from '../../utils/hash';
 import { RolesEnum } from '../../common/enums';
 import { SuccessRo } from '../../common/ro';
+import { QueryRunnerFactory } from '../../infrastructure/databases';
+import { USER_SUB_REMOVE_EVENT } from './constants';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly hashService: HashUtil,
     private readonly usersRepository: UserRepository,
+    private readonly queryRunnerFactory: QueryRunnerFactory,
   ) {}
 
   async getAll(): Promise<UserEntity[]> {
@@ -58,15 +61,31 @@ export class UserService {
     return this.usersRepository.findOneBy({ id });
   }
 
-  async delete(id: UserEntity['id']): Promise<SuccessRo> {
-    const user = await this.usersRepository.findOneBy({ id });
+  async delete(userId: UserEntity['id']): Promise<SuccessRo> {
+    const queryRunner = this.queryRunnerFactory.create();
 
-    if (!user) return { success: false };
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    const removedUser = await this.usersRepository.remove(user);
+      const user = queryRunner.manager.create(UserEntity, { id: userId });
 
-    if (!removedUser) return { success: false };
+      const subscriptionData = {
+        id: userId,
+        eventType: USER_SUB_REMOVE_EVENT,
+      };
 
-    return { success: true };
+      await queryRunner.manager.remove(UserEntity, user, {
+        data: subscriptionData,
+      });
+
+      await queryRunner.commitTransaction();
+      return { success: true };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

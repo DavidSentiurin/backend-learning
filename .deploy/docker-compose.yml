@@ -1,7 +1,8 @@
 version: "3.8"
 services:
-  database:
+  postgres:
     image: postgres:17.5
+    restart: always
     container_name: local_pgdb
     ports:
       - ${POSTGRES_PORT}
@@ -9,6 +10,17 @@ services:
       - .env
     volumes:
       - ./data/postgres:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:8.0
+    restart: always
+    ports:
+      - ${REDIS_PORT}
+    env_file:
+      - .env
+    volumes:
+      - ./data/redis/data:/root/redis
+      - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
   pgadmin:
     image: dpage/pgadmin4

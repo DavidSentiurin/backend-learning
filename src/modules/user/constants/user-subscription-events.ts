@@ -1,0 +1,3 @@
+const USER_SUBSCIPTION_PREFIX = 'user';
+
+export const USER_SUB_REMOVE_EVENT = `${USER_SUBSCIPTION_PREFIX}:remove`;
