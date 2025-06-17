@@ -13,10 +13,13 @@ import { SessionModule } from '../session/session.module';
 
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
+import { RefreshTokenEntity } from './entities';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Global()
 @Module({
   imports: [
+    TypeOrmModule.forFeature([RefreshTokenEntity]),
     UserModule,
     SessionModule,
     PassportModule,
