@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
@@ -25,6 +26,7 @@ import { SessionModule } from './modules/session/session.module';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     PostgresModule,
     SessionModule,
   ],

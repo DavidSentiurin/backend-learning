@@ -1,11 +1,18 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { LoginRo } from './ro';
-import { LoginDto, RegisterDto } from './dto';
+import { LoginDto, RefreshTokenDto, RegisterDto } from './dto';
 
 import { AuthService } from './services';
 import { UserRo } from '../user/ro';
+import { SuccessRo } from '../../common/ro';
 import { GetUser } from '../user/decorators';
 import { AuthGuard } from './guards';
 
@@ -18,18 +25,55 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto): Promise<UserRo> {
     const createdUser = await this.authService.register(registerDto);
 
+    if (!createdUser) {
+      throw new InternalServerErrorException({
+        message: ['Login system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
+
     return UserRo.fromEntity(createdUser);
   }
 
   @ApiResponse({ type: LoginRo })
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<LoginRo> {
-    return this.authService.login(loginDto);
+    const tokens = await this.authService.login(loginDto);
+
+    if (!tokens) {
+      throw new InternalServerErrorException({
+        message: ['Login system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
+
+    return tokens;
   }
 
   @Post('logout')
   @UseGuards(AuthGuard)
-  async logout(@GetUser('id') userId: UserRo['id']) {
-    return this.authService.logout(userId);
+  async logout(@GetUser('id') userId: UserRo['id']): Promise<SuccessRo> {
+    const { success } = (await this.authService.logout(userId)) || {};
+
+    if (!success) {
+      throw new InternalServerErrorException({
+        message: ['Login system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
+
+    return { success };
+  }
+
+  @Post('refresh')
+  @UseGuards(AuthGuard)
+  async refresh(
+    @GetUser('id') userId: UserRo['id'],
+    @Body() refreshToken: RefreshTokenDto,
+  ) {
+    console.log('refreshToken', refreshToken);
   }
 }

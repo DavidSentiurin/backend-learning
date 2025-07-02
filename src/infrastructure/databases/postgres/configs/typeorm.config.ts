@@ -21,6 +21,7 @@ const config: DataSourceConfig = {
   synchronize: process.env.POSTGRES_SYNCHRONIZE === 'true',
   logging: process.env.POSTGRES_LOGGING === 'true',
   migrationsTableName: 'migrations',
+  useUTC: true,
 };
 
 const dataSource = new DataSource(config);

@@ -3,13 +3,13 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   UseGuards,
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
@@ -62,7 +62,13 @@ export class UserController {
   async findUserById(@Param() params: UserIdDto) {
     const user = await this.usersService.findById(params.id);
 
-    if (!user) throw new NotFoundException();
+    if (!user) {
+      throw new InternalServerErrorException({
+        message: ['User system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
 
     return UserRo.fromEntity(user);
   }
@@ -74,7 +80,13 @@ export class UserController {
   async update(@Param() params: UserIdDto, @Body() user: UpdateUserDto) {
     const updatedUser = await this.usersService.update(params.id, user);
 
-    if (!updatedUser) throw new NotFoundException();
+    if (!updatedUser) {
+      throw new InternalServerErrorException({
+        message: ['User system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
 
     return UserRo.fromEntity(updatedUser);
   }
@@ -86,7 +98,13 @@ export class UserController {
   async delete(@Param() params: UserIdDto): Promise<SuccessRo> {
     const { success } = await this.usersService.delete(params.id);
 
-    if (!success) throw new NotFoundException();
+    if (!success) {
+      throw new InternalServerErrorException({
+        message: ['User system temporarily unavailable'],
+        error: 'SYSTEM_ERROR',
+        statusCode: 500,
+      });
+    }
 
     return { success: true };
   }

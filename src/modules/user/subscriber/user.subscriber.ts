@@ -27,7 +27,7 @@ export class UserSubscriber implements EntitySubscriberInterface<UserEntity> {
     const { data } = event.queryRunner;
 
     if (!isUserRemoveEventData(data))
-      throw new InternalServerErrorException('Subscriber not registered');
+      throw new InternalServerErrorException(['Subscriber not registered']);
 
     await this.authService.logout(data.id);
   }

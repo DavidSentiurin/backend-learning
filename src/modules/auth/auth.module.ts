@@ -5,18 +5,23 @@ import { ConfigService } from '@nestjs/config';
 
 import { JwtStrategy } from './strategies';
 import { HashUtil } from '../../utils/hash';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthService, AuthSessionService } from './services';
 import { AuthGuard } from './guards';
 import { AuthUtil } from './utils';
+import { RefreshTokenEntity } from './entities';
+import { RefreshTokenRepository } from './repositories';
+import { CleanupRefreshTokensCron } from './crons';
+import { QueryRunnerFactory } from '../../infrastructure/databases';
 import { SessionModule } from '../session/session.module';
-
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 
 @Global()
 @Module({
   imports: [
+    TypeOrmModule.forFeature([RefreshTokenEntity]),
     UserModule,
     SessionModule,
     PassportModule,
@@ -25,11 +30,6 @@ import { UserModule } from '../user/user.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
-        signOptions: {
-          expiresIn: Number(
-            configService.get('ACCESS_TOKEN_EXPIRATION', 86400),
-          ), // the fallback is one day
-        },
       }),
     }),
   ],
@@ -40,6 +40,9 @@ import { UserModule } from '../user/user.module';
     JwtStrategy,
     AuthGuard,
     AuthUtil,
+    RefreshTokenRepository,
+    CleanupRefreshTokensCron,
+    QueryRunnerFactory,
   ],
   controllers: [AuthController],
   exports: [AuthService, AuthSessionService, AuthUtil],

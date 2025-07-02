@@ -1,3 +1,4 @@
-export interface JwtPayload {
+export interface IJwtPayload {
   sub: string;
+  rId: string;
 }

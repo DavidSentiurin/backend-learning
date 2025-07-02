@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { IsUniqUserEmailConstraint, IsUserIdConstraint } from './validators';
+import {
+  IsUniqUserEmailConstraint,
+  IsUserEmailExistConstraint,
+  IsUserIdConstraint,
+} from './validators';
 
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
@@ -19,6 +23,7 @@ import { UserSubscriber } from './subscriber';
   providers: [
     IsUserIdConstraint,
     IsUniqUserEmailConstraint,
+    IsUserEmailExistConstraint,
     UserService,
     HashUtil,
     UserRepository,
@@ -26,6 +31,11 @@ import { UserSubscriber } from './subscriber';
     UserSubscriber,
   ],
   controllers: [UserController],
-  exports: [IsUserIdConstraint, IsUniqUserEmailConstraint, UserService],
+  exports: [
+    IsUserIdConstraint,
+    IsUniqUserEmailConstraint,
+    IsUserEmailExistConstraint,
+    UserService,
+  ],
 })
 export class UserModule {}

@@ -3,3 +3,7 @@ export {
   IsUniqUserEmail,
 } from './is-uniq-user-email.validator';
 export { IsUserIdConstraint, IsUserId } from './is-user-id.validator';
+export {
+  IsUserEmailExistConstraint,
+  IsUserEmailExist,
+} from './is-user-email-exist.validator';

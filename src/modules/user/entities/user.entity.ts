@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { LanguagesEnum, RolesEnum } from '../../../common/enums';
 import { MyBaseEntity } from '../../../common/entities';
@@ -8,6 +8,7 @@ export class UserEntity extends MyBaseEntity {
   @Column({ nullable: true, length: 2083 })
   avatar?: string;
 
+  @Index('users_email_index', { unique: true })
   @Column({ unique: true, length: 200 })
   email: string;
 
