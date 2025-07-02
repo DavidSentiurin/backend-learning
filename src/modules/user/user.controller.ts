@@ -19,18 +19,15 @@ import { GetUser } from './decorators';
 import { UpdateUserDto, UserIdDto } from './dto';
 import { UserRo } from './ro';
 import { UserEntity } from './entities';
-import { RolesEnum } from '../../common/enums';
-import { Roles } from '../../common/decorators';
 import { SuccessRo } from '../../common/ro';
-import { AuthGuard, RolesGuard } from '../auth/guards';
+import { AuthGuard, ResourceGuard } from 'nest-keycloak-connect';
 
 @Controller('users')
 export class UserController {
   constructor(private usersService: UserService) {}
 
   @ApiResponse({ type: [UserRo] })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles([RolesEnum.ADMIN])
+  @UseGuards(AuthGuard, ResourceGuard)
   @Get()
   async findAllUsers(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
@@ -48,16 +45,14 @@ export class UserController {
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles()
+  @UseGuards(AuthGuard, ResourceGuard)
   @Get('me')
   ownProfile(@GetUser() user: UserEntity) {
     return UserRo.fromEntity(user);
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles()
+  @UseGuards(AuthGuard, ResourceGuard)
   @Get(':id')
   async findUserById(@Param() params: UserIdDto) {
     const user = await this.usersService.findById(params.id);
@@ -74,8 +69,7 @@ export class UserController {
   }
 
   @ApiResponse({ type: UserRo })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles()
+  @UseGuards(AuthGuard, ResourceGuard)
   @Patch(':id')
   async update(@Param() params: UserIdDto, @Body() user: UpdateUserDto) {
     const updatedUser = await this.usersService.update(params.id, user);
@@ -92,8 +86,7 @@ export class UserController {
   }
 
   @ApiResponse({ type: SuccessRo })
-  @UseGuards(AuthGuard, RolesGuard)
-  // @Roles([RolesEnum.ADMIN])
+  @UseGuards(AuthGuard, ResourceGuard)
   @Delete(':id')
   async delete(@Param() params: UserIdDto): Promise<SuccessRo> {
     const { success } = await this.usersService.delete(params.id);

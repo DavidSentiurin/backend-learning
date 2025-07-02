@@ -1,1 +1,0 @@
-export { AUTH_SESSION_PREFIX } from './auth-session-prefix';

@@ -7,14 +7,13 @@ import {
 } from 'typeorm';
 
 import { UserEntity } from '../entities';
-import { AuthService } from '../../auth/services';
 import { isUserRemoveEventData } from '../utils';
 
 @EventSubscriber()
 export class UserSubscriber implements EntitySubscriberInterface<UserEntity> {
   constructor(
     dataSource: DataSource,
-    private readonly authService: AuthService,
+    // private readonly authService: AuthService,
   ) {
     dataSource.subscribers.push(this);
   }
@@ -29,6 +28,6 @@ export class UserSubscriber implements EntitySubscriberInterface<UserEntity> {
     if (!isUserRemoveEventData(data))
       throw new InternalServerErrorException(['Subscriber not registered']);
 
-    await this.authService.logout(data.id);
+    // await this.authService.logout(data.id);
   }
 }

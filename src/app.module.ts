@@ -2,20 +2,24 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 
 import { PostgresModule, RedisModule } from './infrastructure/databases';
 import { HashUtil } from './utils/hash';
 import { SessionModule } from './modules/session/session.module';
+import { KeycloakModule } from './infrastructure/apis';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard, Resource, ResourceGuard, RoleGuard } from 'nest-keycloak-connect';
+import { UserEntity } from './modules/user/entities';
 
+@Resource(UserEntity.name)
 @Module({
   imports: [
     UserModule,
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    KeycloakModule,
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
